@@ -1,33 +1,44 @@
 #!/bin/sed -rf
 
 # remove garbage
-s/\\ / /
+s/\\ / /g
 s/ +/ /g
+tbug;:bug
 
 # start
-#s!^\([0-9]*\): \([^ :]*\):\? !/interfaces/\2/data=!
+s!: <([^>]*)>! flags \1!
+ti
 
-s/: <([^>]*)>/ flags \1/
+# address
 s/^([0-9]*): ([^ ]*) (.*) \2$/\1: \2 \3/
+s! scope global ([^ ]+) ! scope global-\1 !
+s!^([0-9]*): ([^ ]*) (.*)$!\3 /interfaces/interface/address/!
+ba
 
-#s!^([0-9]*): ([^ ]*) inet ([^ /]*)/([^ ]*) (.*)$!\1: \2=\3 \5 family ipv4 mask \4!
+# interface
+:i
+s!/!-!
+s!^([0-9]*): ([^ ]*) (.*)$!\3 name \2 index \1 /interfaces/interface/!
 
-s/^([0-9]*): ([^ ]*) (.*)$/\3 \2=\1/
-
+:a
 s/^/ /
 x
 
-:a
+# main cycle throw line
+:c
 G
 h
 s/ ([^\n ]+) ([^\n ]+) ([^\n ]+)$/ \3/
 x
-s/.* ([^\n ]+) ([^\n ]+) ([^\n ]+)/\3 \1=\2/
-ta
+s/.* ([^\n ]+) ([^\n ]+) ([^\n ]+)/\3\1=\2/
+tc
 
+s/^.*\n//
+#x
+G
+x
 s/.*//
 x
 
 s/\n\n[^\n]*$//
-
-#s/\n/ /g
+s/^ //
