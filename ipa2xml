@@ -1,0 +1,2 @@
+#!/bin/bash
+ip -o a | sed -rf $(dirname $0)/ipa2xml.sed | 2xml | xmlindent
